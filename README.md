@@ -1,330 +1,143 @@
-# Multimodal-Emotion-Recognition-with-MELD
-Text–Audio Fusion Inspired by DialogueTMR
-# Real-Time Multimodal Emotion Recognition with MELD
+# Multimodal Emotion Recognition with MELD
+
 ### Text–Audio Fusion Inspired by DialogueTMR
 
 ## Overview
 
-This project explores real-time multimodal emotion recognition using the
-MELD dataset. The system combines textual and acoustic information to
-predict one of the seven MELD emotion categories.
+This project explores **multimodal emotion recognition** using the MELD dataset, combining textual and acoustic information to predict one of the seven emotion categories defined in MELD.
 
-The project was developed as a time-constrained ML prototype. The main
-objective was therefore to build, evaluate, and demonstrate a complete
-multimodal inference pipeline rather than reproduce a large
-state-of-the-art architecture in full.
+The project was developed as a **three-day machine learning prototype**. Given this time constraint, the objective was not to fully reproduce a large state-of-the-art architecture, but rather to design, train, evaluate, and demonstrate a complete multimodal emotion-recognition pipeline.
 
-The final system uses:
+To make experimentation feasible within the available time, the system was built around a relatively lightweight architecture. This allowed the project to focus on the interaction between pretrained text and audio representations, modality-specific transformations, multimodal fusion, and emotion classification while maintaining manageable training times.
 
-- DistilBERT for textual representations
-- Wav2Vec2 for acoustic representations
-- A lightweight multimodal fusion module
-- A classifier for MELD emotion prediction
+The architecture is inspired by ideas from **DialogueTMR**, particularly the use of modality-specific representations and cross-modal interaction, while simplifying the overall design to suit the scope and computational constraints of the project.
 
-A small language model can subsequently consume the predicted emotional
-state together with the utterance to generate a short response suitable
-for an interactive system.
-
+---
 
 ## Motivation
 
-Emotion cannot always be inferred from words alone.
+Emotion cannot always be reliably inferred from words alone.
 
-For example, the same sentence can communicate different emotional states
-depending on vocal tone, emphasis, timing, or prosody.
+The same sentence may communicate very different emotional states depending on **vocal tone, emphasis, timing, intensity, and prosody**. Text provides strong semantic information about what is being said, while audio provides complementary information about how it is being said.
 
-MELD provides aligned conversational text, audio, video, and emotion
-annotations, making it suitable for studying multimodal emotion
-recognition.
+Combining these two modalities can therefore provide a richer representation of the speaker's emotional state than either modality independently.
 
-This project focuses on the Text + Audio track.
+The **MELD (Multimodal EmotionLines Dataset)** provides conversational text, audio, video, speaker information, and emotion annotations, making it well suited for exploring multimodal emotion recognition.
 
+This project focuses specifically on the **Text + Audio** modalities.
 
-## From Literature Review to Architecture
-## Note add the papers used
-Before implementing the model, I reviewed work on multimodal emotion
-recognition using MELD.
+---
 
-The literature survey motivated the use of learned multimodal fusion
-rather than relying exclusively on simple feature concatenation.
+## Project Documentation
 
-DialogueTMR was particularly useful as architectural inspiration. Its
-fusion strategy and contextual modeling illustrate how representations
-from different modalities can interact before emotion classification.
+The project is divided into several stages. More detailed documentation about the development process, dataset, training procedure, and individual model components is available in the following sections:
 
-Reproducing DialogueTMR was outside the intended scope of this
-time-constrained prototype.
+### [Project Timeline](docs/PROJECT_TIMELINE.md)
 
-Instead, this project investigates a simplified architecture inspired by
-those ideas:
+A chronological overview of the three-day development process, including the approaches explored, design decisions, experiments, limitations, and changes that led to the final architecture.
 
-Text representation ──┐
-                      ├── Multimodal Fusion ── Emotion Classifier
-Audio representation ─┘
+### [Dataset and Preprocessing](docs/DATASET.md)
 
-The goal is to preserve the central idea of learned cross-modal
-interaction while keeping the model small, interpretable, and practical
-to train and deploy.
+Detailed information about the MELD dataset and how it was prepared for this project, including dataset structure, emotion classes, text and audio preprocessing, class distribution, and feature extraction.
 
+### [Stage 1 — Intra-Modal Transformation](docs/INTRA_MODAL_TRANSFORMATION.md)
+
+Description of the first stage of the model, where pretrained text and audio representations are independently transformed before multimodal interaction. This section covers the architecture, training procedure, implementation, and experimental results.
+
+### [Stage 2 — Multi-Grain Interactive Fusion](docs/MULTIGRAIN_FUSION.md)
+
+Description of the multimodal fusion stage, where the transformed text and audio representations interact before being passed to the final emotion classifier. This section covers the fusion strategy, Transformer-based classification, training procedure, and evaluation results.
+
+---
 
 ## Dataset
 
-MELD (Multimodal EmotionLines Dataset) contains conversational utterances
-with:
+This project uses the **MELD (Multimodal EmotionLines Dataset)**, a conversational multimodal dataset containing utterances extracted from the television series *Friends*.
 
-- text
-- audio
-- video
-- speaker information
-- dialogue information
-- emotion labels
+Each utterance includes multimodal information and an emotion annotation corresponding to one of seven categories:
 
-This implementation uses only text and audio.
+* Anger
+* Disgust
+* Fear
+* Joy
+* Neutral
+* Sadness
+* Surprise
 
-The target classes are:
+For this project, only the **textual and acoustic modalities** are used.
 
-- neutral
-- joy
-- sadness
-- anger
-- surprise
-- fear
-- disgust
+A detailed description of the dataset, preprocessing pipeline, feature extraction process, and data distribution can be found in the **[Dataset and Preprocessing documentation](docs/DATASET.md)**.
 
+---
 
 ## Architecture
 
-### Text Encoder
+The proposed system follows a two-stage multimodal architecture.
 
-Each utterance is encoded using DistilBERT:
+### Stage 1 — Intra-Modal Transformation
 
-    Utterance
-       ↓
-    DistilBERT
-       ↓
-    768-dimensional representation
+Text and audio are first processed independently.
 
+Pretrained language and speech models are used to obtain initial representations for each modality. These embeddings are then passed through modality-specific transformation modules to produce representations better suited for the downstream emotion-recognition task.
 
-### Audio Encoder
+```text
+Text  ──► Text Encoder  ──► Text Embeddings  ──► Intra-Modal Transformation ──┐
+                                                                              │
+                                                                              ▼
+                                                                      Multimodal Fusion
+                                                                              ▲
+                                                                              │
+Audio ──► Audio Encoder ──► Audio Embeddings ──► Intra-Modal Transformation ──┘
+```
 
-The corresponding audio clip is encoded using Wav2Vec2:
+More information about this stage can be found in **[Stage 1 — Intra-Modal Transformation](docs/INTRA_MODAL_TRANSFORMATION.md)**.
 
-    Audio waveform
-       ↓
-    Wav2Vec2
-       ↓
-    Temporal representations
-       ↓
-    Mean pooling
-       ↓
-    768-dimensional representation
+### Stage 2 — Multi-Grain Interactive Fusion
 
+The transformed text and audio representations are combined using a **multi-grain interactive fusion strategy** designed to capture complementary information across both modalities.
 
-### Multimodal Fusion
+The resulting multimodal representation is then processed by a **Transformer-based classifier** to predict the final emotion category.
 
-The text and audio representations are projected to a common latent
-dimension and combined using a lightweight learned fusion mechanism.
+```text
+Transformed Text Features ──┐
+                            │
+                            ▼
+                  Multi-Grain Interactive
+                          Fusion
+                            ▲
+                            │
+Transformed Audio Features ─┘
+                            │
+                            ▼
+                  Transformer Classifier
+                            │
+                            ▼
+                  Emotion Classification
+                            │
+                            ▼
+           Anger | Disgust | Fear | Joy
+          Neutral | Sadness | Surprise
+```
 
-    DistilBERT [768] ──> Projection ──┐
-                                     │
-                                     ├── Fusion ──> Fused representation
-                                     │
-    Wav2Vec2 [768] ───> Projection ──┘
+A detailed explanation of the fusion mechanism and classifier is available in **[Stage 2 — Multi-Grain Interactive Fusion](docs/MULTIGRAIN_FUSION.md)**.
 
-The fusion module is inspired by multi-grained multimodal fusion
-approaches, but intentionally simplified for this prototype.
-
-
-### Emotion Classifier
-
-The fused representation is passed through a small neural classifier:
-
-    Fused representation
-          ↓
-        Linear
-          ↓
-         ReLU
-          ↓
-       Dropout
-          ↓
-        Linear
-          ↓
-    7 emotion classes
-
-
-## Why Utterance-Level Classification?
-
-MELD contains complete dialogues, and dialogue context can improve emotion
-recognition.
-
-However, the core prototype performs classification at the utterance
-level.
-
-This was an intentional engineering decision.
-
-An utterance-level architecture:
-
-1. provides a clear multimodal baseline;
-2. simplifies real-time inference;
-3. reduces training complexity;
-4. allows the contribution of audio and text fusion to be measured
-   independently from dialogue-context modeling.
-
-Dialogue-level contextual modeling using a Transformer is therefore
-considered a possible extension rather than a dependency of the core
-system.
-
-
-## Experiments
-
-The following models are evaluated:
-
-1. Text-only baseline
-2. Audio-only baseline
-3. Text + Audio concatenation baseline
-4. Text + Audio learned fusion
-
-This makes it possible to determine whether multimodal information
-improves emotion classification and whether learned fusion provides value
-beyond simple concatenation.
-
-
-## Evaluation
-
-Models are evaluated on the MELD validation/test split using metrics such
-as:
-
-- Accuracy
-- Weighted F1
-- Macro F1
-- Per-class precision
-- Per-class recall
-- Confusion matrix
-
-Inference latency and resource usage are also measured because the target
-application is interactive.
-
-
-## Real-Time Inference
-
-The intended inference pipeline is:
-
-    User speech
-        │
-        ├── Transcript ──> DistilBERT ──┐
-        │                               │
-        └── Audio ───────> Wav2Vec2 ────┤
-                                        ↓
-                                      Fusion
-                                        ↓
-                                 Emotion prediction
-                                        ↓
-                                 Structured state
-                                        ↓
-                              Response generation
-
-Example output:
-
-{
-    "emotion": "anger",
-    "confidence": 0.81,
-    "response": "That sounds frustrating. What happened?"
-}
-
-
-## Response Generation
-
-Emotion recognition and response generation are kept as separate
-components.
-
-The multimodal classifier is responsible for estimating emotional state.
-
-A small local language model can then receive:
-
-- the original utterance
-- the predicted emotion
-- optionally the prediction confidence
-
-and generate a short response grounded in the interaction.
-
-Keeping perception and generation separate makes the architecture easier
-to inspect, evaluate, and modify.
-
-
-## Constraints and Design Decisions
-
-This project was developed under a two-to-three-day time constraint.
-
-As a result, priority was given to:
-
-- completing the full pipeline;
-- establishing meaningful baselines;
-- evaluating multimodal fusion;
-- maintaining a small local inference footprint;
-- producing reproducible experiments.
-
-Several potentially valuable extensions were intentionally left outside
-the core implementation.
-
+---
 
 ## Future Work
 
-Possible extensions include:
+Due to the three-day development constraint, the current system should be considered a **functional prototype rather than a fully optimized architecture**.
 
-- dialogue-context modeling;
-- speaker embeddings;
-- Transformer-based contextualization across previous utterances;
-- end-to-end fine-tuning of DistilBERT and Wav2Vec2;
-- alternative multimodal fusion mechanisms;
-- text + audio + vision;
-- quantization for lower-latency local inference;
-- improved response generation.
+Several extensions could be explored in future work:
 
+* Perform more extensive hyperparameter optimization.
+* Investigate deeper or more expressive modality-specific transformation modules.
+* Experiment with alternative text and speech encoders.
+* Explore more sophisticated cross-modal attention and fusion mechanisms.
+* Address the class imbalance present in MELD more extensively.
+* Incorporate the visual modality available in MELD.
+* Evaluate the contribution of each modality through ablation experiments.
+* Compare the multimodal architecture against stronger unimodal and multimodal baselines.
+* Explore conversational context across multiple utterances rather than classifying each utterance independently.
+* Optimize the complete pipeline for real-time inference.
 
-## Limitations
-
-The current prototype predicts emotion primarily from the current
-utterance.
-
-This means that emotions requiring conversational history may be harder
-to identify.
-
-The pretrained text and audio representations are initially frozen,
-which reduces compute requirements but prevents the encoders from adapting
-specifically to MELD.
-
-MELD is also class-imbalanced, so overall accuracy alone is insufficient
-for evaluating model quality.
-
-
-## Repository Structure
-
-meld-audio-text-emotion/
-│
-├── README.md
-├── requirements.txt
-│
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_text_embeddings.ipynb
-│   ├── 03_audio_embeddings.ipynb
-│   └── 04_training_and_evaluation.ipynb
-│
-├── src/
-│   ├── data.py
-│   ├── encoders.py
-│   ├── fusion.py
-│   ├── classifier.py
-│   ├── train.py
-│   ├── evaluate.py
-│   └── inference.py
-│
-├── configs/
-│   └── baseline.yaml
-│
-├── results/
-│   ├── metrics.json
-│   └── confusion_matrix.png
-│
-└── demo/
-    └── app.py
+These extensions would help determine how the prototype architecture scales beyond the computational and time constraints of the initial project.
