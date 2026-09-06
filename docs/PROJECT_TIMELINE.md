@@ -15,7 +15,7 @@ The project began with a review of the current state of the art in **Multimodal 
 The main reference used for this initial exploration was:
 
 > **Wu et al. (2025) — *Multimodal Emotion Recognition in Conversations: A Survey of Methods, Trends, Challenges and Prospects***
-> **[Read the paper →](Multimodal-Emotion-Recognition-with-MELD/papers/MERC_Survey_2025.pdf)**
+[Read the MERC Survey →](../papers/MERC_Survey_2025.pdf)
 
 The survey provided an overview of recent approaches to multimodal emotion recognition and categorizes current methods into three main groups:
 
