@@ -25,13 +25,15 @@ For this reason, the model does not process each utterance independently. A shor
 
 The goal of the intra-modal stage is therefore:
 
-\[
-\text{Text context} \rightarrow \text{Text Transformer}
-\]
+$$
+\[ \text{Text context} \rightarrow \text{Text Transformer} \]
+$$
 
+$$
 \[
 \text{Audio context} \rightarrow \text{Audio Transformer}
 \]
+$$
 
 followed by a simple baseline fusion and emotion classifier.
 
@@ -109,37 +111,47 @@ The buffers are cleared whenever the dialogue changes. This prevents the context
 
 For a full context window:
 
+$$
 \[
 [U_{t-2}, U_{t-1}, U_t]
 \]
+$$
 
 the model receives:
 
+$$
 \[
 [T_{t-2}, T_{t-1}, T_t]
 \]
+$$
 
 for text and:
 
+$$
 \[
 [A_{t-2}, A_{t-1}, A_t]
 \]
+$$
 
 for audio.
 
 The target is the emotion of the current utterance:
 
+$$
 \[
 y_t = Emotion(U_t)
 \]
+$$ 
 
 Therefore, a training example can be represented as:
 
+$$
 \[
 ([T_{t-2}, T_{t-1}, T_t],
 [A_{t-2}, A_{t-1}, A_t])
 \rightarrow y_t
 \]
+$$
 
 Ground-truth emotions from previous utterances are stored as metadata but are **not used as model inputs**.
 
@@ -194,9 +206,11 @@ The experimental configuration used in this baseline was:
 
 Each modality first uses a linear projection to transform its original embedding dimension into the common Transformer dimension:
 
+$$
 \[
 Embedding_{input} \rightarrow 256
 \]
+$$
 
 Positional embeddings are then added so that the Transformer can distinguish the relative order of utterances inside the context window.
 
@@ -276,22 +290,28 @@ current_audio = audio_context[:, -1, :]
 
 Both representations have dimension:
 
+$$
 \[
 256
 \]
+$$
 
 They are concatenated:
 
+$$
 \[
 h_{combined} =
 [h_{text};h_{audio}]
 \]
+$$
 
 which produces:
 
+$$
 \[
 256 + 256 = 512
 \]
+$$
 
 The concatenated representation is passed through a small feed-forward classifier:
 
@@ -556,15 +576,19 @@ Initially, the Transformer weights can be frozen while the fusion module and cla
 
 This allows the project to compare:
 
+$$
 \[
 \text{Intra-Modal Transformers + Concatenation}
 \]
+$$
 
 against:
 
+$$
 \[
 \text{Intra-Modal Transformers + MGIF}
 \]
+$$
 
 while keeping the context representation and evaluation protocol consistent.
 
