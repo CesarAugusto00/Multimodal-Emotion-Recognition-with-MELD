@@ -30,24 +30,63 @@ This project focuses specifically on the **Text + Audio** modalities.
 
 ## Project Documentation
 
-The project is divided into several stages. More detailed documentation about the development process, dataset, training procedure, and individual model components is available in the following sections:
+The project is divided into several stages. More detailed documentation about the development process, dataset, model architecture, training procedure, experimental results, and future extensions is available in the following sections:
 
 ### [Project Timeline](docs/PROJECT_TIMELINE.md)
 
-A chronological overview of the three-day development process, including the approaches explored, design decisions, experiments, limitations, and changes that led to the final architecture.
+A chronological overview of the three-day development process, from the initial state-of-the-art review to the final architecture. This document describes the approaches explored, major design decisions, experiments, limitations, and changes made throughout development.
 
 ### [Dataset and Preprocessing](docs/DATASET.md)
 
-Detailed information about the MELD dataset and how it was prepared for this project, including dataset structure, emotion classes, text and audio preprocessing, class distribution, and feature extraction.
+Detailed information about the MELD dataset and how it was prepared for this project, including the dataset structure, emotion classes, text normalization, audio preprocessing, class distribution, dialogue-level train/validation split, and feature extraction using DistilBERT and Wav2Vec2.
 
 ### [Stage 1 — Intra-Modal Transformation](docs/INTRA_MODAL_TRANSFORMATION.md)
 
-Description of the first stage of the model, where pretrained text and audio representations are independently transformed before multimodal interaction. This section covers the architecture, training procedure, implementation, and experimental results.
+Description of the first stage of the emotion-recognition model, where pretrained text and audio representations are independently transformed while incorporating conversational context. This section covers the rolling context window, Transformer architecture, training procedure, implementation, and experimental results.
 
 ### [Stage 2 — Multi-Grain Interactive Fusion](docs/MULTIGRAIN_FUSION.md)
 
-Description of the multimodal fusion stage, where the transformed text and audio representations interact before being passed to the final emotion classifier. This section covers the fusion strategy, Transformer-based classification, training procedure, and evaluation results.
+Description of the multimodal fusion stage inspired by DialogueTRM, where the contextualized text and audio representations interact before being passed to the emotion classifier. This section covers the fusion strategy, MGIF-inspired architecture, training procedure, comparison with the concatenation baseline, and evaluation results.
 
+### [Results and Complete Pipeline](docs/RESULTS_AND_PIPELINE.md)
+
+Presentation of the experimental results and the complete end-to-end inference architecture. This document describes how raw text and audio are processed through DistilBERT, Wav2Vec2, the intra-modal Transformers, multimodal fusion, and emotion classifier. It also explains how the resulting structured emotional state is connected to **Llama 3.2 1B through Ollama** to generate a short emotion-aware response.
+
+### [Future Work](docs/FUTURE_WORK.md)
+
+Possible extensions toward a fully real-time emotion-aware conversational system. These include microphone input, Voice Activity Detection (VAD), automatic utterance segmentation, speech-to-text transcription, automatic dialogue/session management, text-to-speech output, streaming inference, and latency optimization.
+
+The proposed future architecture extends the current prototype toward the following real-time interaction loop:
+
+```text
+Microphone
+    │
+    ▼
+Voice Activity Detection
+    │
+    ▼
+Utterance Recording
+    │
+    ├──────────────► Speech-to-Text ──► DistilBERT
+    │
+    └──────────────► Wav2Vec2
+                              │
+                              ▼
+                   Emotion Recognition
+                              │
+                              ▼
+                   Structured Emotion State
+                              │
+                              ▼
+                       Llama 3.2 1B
+                          (Ollama)
+                              │
+                              ▼
+                        Text-to-Speech
+                              │
+                              ▼
+                         Robot Response
+```
 ---
 
 ## Dataset
