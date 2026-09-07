@@ -132,9 +132,7 @@ $$
 A softmax converts these scores into modality weights:
 
 $$
-[\alpha_T, \alpha_A]
-=
-\text{softmax}([s_T, s_A])
+[\alpha_T, \alpha_A]=\text{softmax}([s_T, s_A])
 $$
 
 where:
@@ -146,9 +144,7 @@ $$
 The vector-level representation is then:
 
 $$
-h_{\text{vector}}
-=
-\alpha_T h_T + \alpha_A h_A
+h_{\text{vector}}=\alpha_T h_T + \alpha_A h_A
 $$
 
 This allows the model to dynamically assign more importance to text or audio depending on the input.
@@ -162,11 +158,7 @@ A single weight for an entire modality may be too coarse. Different dimensions o
 The neuron-grained component therefore learns a 256-dimensional gate:
 
 $$
-g =
-\sigma
-\left(
-W_g[h_T;h_A]+b_g
-\right)
+g =\sigma\left(W_g[h_T;h_A]+b_g\right)
 $$
 
 where:
@@ -178,11 +170,7 @@ $$
 The representations are combined element-by-element:
 
 $$
-h_{\text{neuron}}
-=
-g \odot h_T
-+
-(1-g)\odot h_A
+h_{\text{neuron}}=g \odot h_T+(1-g)\odot h_A
 $$
 
 This gives the model finer control over how information from the two modalities is combined.
@@ -194,9 +182,7 @@ This gives the model finer control over how information from the two modalities 
 The vector- and neuron-grained representations are concatenated:
 
 $$
-h_{\text{combined}}
-=
-[h_{\text{vector}};h_{\text{neuron}}]
+h_{\text{combined}}=[h_{\text{vector}};h_{\text{neuron}}]
 $$
 
 Since each representation contains 256 dimensions:
@@ -208,9 +194,7 @@ $$
 A linear projection reduces this representation back to 256 dimensions:
 
 $$
-h_{\text{MGIF}}
-=
-W_o h_{\text{combined}}+b_o
+h_{\text{MGIF}}=W_o h_{\text{combined}}+b_o
 $$
 
 The resulting representation is then passed to the emotion classifier.
