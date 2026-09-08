@@ -71,17 +71,8 @@ PPP/
 ├── test_data/
 │   └── example.wav
 │
-├── docs/
-│   ├── DATA_PREPROCESSING.md
-│   ├── INTRA_MODAL_TRANSFORMATION.md
-│   ├── MULTIGRAIN_FUSION.md
-│   └── RESULTS.md
-│
 ├── testing.py
-├── main.py
-├── requirements.txt
-├── .gitignore
-└── README.md
+└── requirements.txt
 ```
 
 ---
