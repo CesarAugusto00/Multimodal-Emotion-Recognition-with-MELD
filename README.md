@@ -87,6 +87,11 @@ Utterance Recording
                               ▼
                          Robot Response
 ```
+
+### [Setup and Running Instructions](code/README.md)
+
+Instructions for setting up and running the complete prototype locally. This guide covers creating a Python virtual environment, installing the required dependencies, setting up **Ollama and Llama 3.2 1B**, preparing the model files, and running the end-to-end pipeline from raw text and audio to emotion classification and response generation.
+
 ---
 
 ## Dataset
